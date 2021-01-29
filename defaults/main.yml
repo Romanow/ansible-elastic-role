@@ -38,7 +38,7 @@ elastic_roles:
 
 elastic_users:
   - name: admin
-    password: root
+    password: qwerty
     roles:
       - admin
 

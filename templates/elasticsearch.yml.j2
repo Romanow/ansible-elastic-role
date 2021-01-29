@@ -14,6 +14,8 @@ node.roles: {{ elastic_node_roles }}
 cluster.name: {{ elastic_cluster_name }}
 cluster.initial_master_nodes: {{ elastic_cluster_nodes }}
 discovery.seed_hosts: {{ elastic_discovery_hosts }}
+{% else %}
+discovery.type: single-node
 {% endif %}
 
 xpack.security.enabled: true
