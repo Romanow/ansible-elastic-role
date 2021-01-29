@@ -1,13 +1,10 @@
 ---
-dependency:
-  name: galaxy
-  options:
-    requirements-file: galaxy.yml
 driver:
   name: docker
 platforms:
   - name: instance-ubuntu-20.04
     image: ubuntu:20.04
+    command: /sbin/init
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     privileged: true
