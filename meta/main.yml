@@ -1,0 +1,13 @@
+---
+# file: meta/main.yml
+galaxy_info:
+  role_name: elastic
+  description: Install and configure Elastic Search cluster
+  author: Romanov Alex <romanowalex@mail.ru>
+  min_ansible_version: 2.10
+  license: EULA
+  platforms:
+    - name: Ubuntu
+      versions:
+        - 20.04
+allow_duplicates: false

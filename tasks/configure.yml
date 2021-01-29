@@ -1,0 +1,118 @@
+---
+# file: tasks/configure.yml
+- name: Configure ElasticSearch JVM options
+  become: yes
+  template:
+    src: jvm.options.j2
+    dest: "{{ elastic_config_dir }}/jvm.options.d/custom.options"
+    owner: "{{ elastic_user }}"
+    group: "{{ elastic_group }}"
+    mode: 0640
+  tags: configure
+
+- name: Configure ElasticSearch
+  become: yes
+  template:
+    src: elasticsearch.yml.j2
+    dest: "{{ elastic_config_dir }}/elasticsearch.yml"
+    owner: "{{ elastic_user }}"
+    group: "{{ elastic_group }}"
+    mode: 0640
+  tags: configure
+
+- name: Configure roles
+  become: yes
+  copy:
+    content: "{{ elastic_roles | to_nice_yaml }}"
+    dest: "{{ elastic_config_dir }}/roles.yml"
+    owner: "{{ elastic_user }}"
+    group: "{{ elastic_group }}"
+    mode: 0640
+  tags: configure
+
+- name: Add users
+  become: yes
+  no_log: yes
+  shell: |-
+    ./elasticsearch-users useradd {{ item.name }} \
+    -p {{ item.password }} \
+    -r {{ item.roles | join(',') }} || true
+  args:
+    chdir: "{{ elastic_bin_dir }}"
+  with_items: "{{ elastic_users }}"
+  tags: configure
+
+- name: Create cert dir
+  become: yes
+  file:
+    dest: "{{ elastic_cert_dir }}"
+    state: directory
+    owner: "{{ elastic_user }}"
+    group: "{{ elastic_user }}"
+    mode: 0750
+  tags: configure
+
+- name: Get Root certificate
+  become: yes
+  run_once: yes
+  block:
+    - name: Generate Root certificate
+      shell: ./elasticsearch-certutil ca --pass "" --out /tmp/ca-{{ elastic_cluster_name }}.p12 || true
+      args:
+        chdir: "{{ elastic_bin_dir }}"
+        creates: "{{ user_home_dir }}/.cluster_cert_created"
+    - name: Copy Root certificate from node
+      fetch:
+        src: "/tmp/ca-{{ cluster_name }}.p12"
+        dest: /tmp/
+        flat: yes
+  tags: configure
+
+- name: Copy Root certificate to nodes
+  become: yes
+  copy:
+    src: "/tmp/ca-{{ cluster_name }}.p12"
+    dest: /tmp/
+    owner: "{{ elastic_user }}"
+    group: "{{ elastic_user }}"
+    mode: 0644
+  tags: configure
+
+- name: Generate Node certificate
+  become: yes
+  shell: |-
+    ./elasticsearch-certutil cert \
+    --ca /tmp/ca-{{ elastic_cluster_name }}.p12 \
+    --ca-pass "" \
+    --dns {{ elastic_node_name }} \
+    --ip {{ elastic_ansible_host }} \
+    --pass "" \
+    --out {{ elastic_cert_dir }}/{{ elastic_node_name }}.p12 || true
+  args:
+    chdir: "{{ elastic_bin_dir }}"
+    creates: "{{ user_home_dir }}/.node_cert_created"
+  tags: configure
+
+- name: Change certificate permissions
+  become: yes
+  file:
+    dest: "{{ elastic_cert_dir }}/{{ elastic_node_name }}.p12"
+    owner: "{{ elastic_elastic_user }}"
+    group: "{{ elastic_elastic_user }}"
+    state: touch
+    mode: 0640
+  tags: configure
+
+- name: Delete Root certificate
+  become: yes
+  file:
+    dest: "/tmp/ca-{{ elastic_cluster_name }}.p12"
+    state: absent
+  tags: configure
+
+- name: Restart EasticSearch
+  become: yes
+  service:
+    name: elasticsearch
+    state: restarted
+  tags: configure

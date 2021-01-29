@@ -1,0 +1,43 @@
+---
+# file: defaults/main.yml
+elastic_version: "7.10.2"
+elastic_user: elasticsearch
+elastic_group: elasticsearch
+
+elastic_config_dir: /etc/elasticsearch
+elastic_log_dir: /var/log/elasticsearch
+elastic_cert_dir: "{{ config_dir }}/certs"
+elastic_bin_dir: "{{ home_dir }}/bin"
+elastic_data_dir: /var/log/elasticsearch
+elastic_bind_host: "{{ ansible_host }}"
+elastic_home_dir: /usr/share/elasticsearch
+
+user_home_dir: /home/{{ ansible_user }}
+
+elastic_http_port: 9200
+elastic_transport_port: 9300
+
+elastic_node_name: "{{ inventory_hostname }}"
+elastic_node_roles:
+  - master
+  - data
+
+elastic_cluster_name: es_cluster
+elastic_cluster_nodes: inventory_hostname
+
+elastic_roles:
+  admin:
+    cluster:
+      - all
+    indices:
+      - names: "*"
+        privileges:
+          - all
+
+elastic_users:
+  - name: admin
+    password: root
+    roles:
+      - admin
+
+elastic_java_memory: 1g

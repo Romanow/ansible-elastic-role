@@ -1,0 +1,9 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: Get package facts
+      package_facts:
+
+    - include_role:
+        name: ansible-elastic-role

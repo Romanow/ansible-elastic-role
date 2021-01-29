@@ -1,0 +1,26 @@
+---
+# file: tasks/install.yml
+- name: Add ElasticSearch repository key
+  become: yes
+  apt_key:
+    url: "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
+    state: present
+
+- name: Add ElasticSearch repository
+  become: yes
+  apt_repository:
+    repo: "deb https://artifacts.elastic.co/packages/7.x/apt stable main"
+    state: present
+
+- name: Install ElasticSearch
+  become: yes
+  apt:
+    name: "elasticsearch={{ elastic_version }}"
+    update_cache: yes
+    state: present
+
+- name: Restart EasticSearch
+  become: yes
+  service:
+    name: elasticsearch
+    state: restarted

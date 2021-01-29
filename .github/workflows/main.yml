@@ -1,0 +1,17 @@
+---
+name: Test role
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: "${{ github.repository }}"
+      - uses: gofrolist/molecule-action@v2
+        with:
+          molecule_command: converge
