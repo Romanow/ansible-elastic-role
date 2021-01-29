@@ -64,13 +64,13 @@
             creates: "{{ user_home_dir }}/.cluster_cert_created"
         - name: Copy Root certificate from node
           fetch:
-            src: "/tmp/ca-{{ cluster_name }}.p12"
+            src: "/tmp/ca-{{ elastic_cluster_name }}.p12"
             dest: /tmp/
             flat: true
 
     - name: Copy Root certificate to nodes
       copy:
-        src: "/tmp/ca-{{ cluster_name }}.p12"
+        src: "/tmp/ca-{{ elastic_cluster_name }}.p12"
         dest: /tmp/
         owner: "{{ elastic_user }}"
         group: "{{ elastic_user }}"
@@ -82,7 +82,7 @@
         --ca /tmp/ca-{{ elastic_cluster_name }}.p12 \
         --ca-pass "" \
         --dns {{ elastic_node_name }} \
-        --ip {{ elastic_ansible_host }} \
+        --ip {{ ansible_host }} \
         --pass "" \
         --out {{ elastic_cert_dir }}/{{ elastic_node_name }}.p12 || true
       args:
@@ -92,8 +92,8 @@
     - name: Change certificate permissions
       file:
         dest: "{{ elastic_cert_dir }}/{{ elastic_node_name }}.p12"
-        owner: "{{ elastic_elastic_user }}"
-        group: "{{ elastic_elastic_user }}"
+        owner: "{{ elastic_user }}"
+        group: "{{ elastic_group }}"
         state: touch
         mode: 0640
 

@@ -30,7 +30,7 @@ elastic_transport_port: 9300
 
 elastic_cluster_enable: false # enable cluster
 # hosts in cluster
-# {{ groups.elastic | map('extract', hostvars, 'ansible_host') | product([transport_port]) | map('join', ':') }}
+# {{ groups.elastic | map('extract', hostvars, 'ansible_host') | product([elastic_transport_port]) | map('join', ':') }}
 elastic_discovery_hosts: []
 elastic_node_name: "{{ inventory_hostname }}" # node name, usually hostname
 elastic_node_roles: # node roles
