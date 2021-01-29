@@ -58,7 +58,7 @@
       block:
         - name: Generate Root certificate
           shell: ./elasticsearch-certutil ca --pass "" \
-                  --out /tmp/ca-{{ elastic_cluster_name }}.p12 || true
+            --out /tmp/ca-{{ elastic_cluster_name }}.p12 || true
           args:
             chdir: "{{ elastic_bin_dir }}"
             creates: "{{ user_home_dir }}/.cluster_cert_created"
@@ -101,10 +101,11 @@
       file:
         dest: "/tmp/ca-{{ elastic_cluster_name }}.p12"
         state: absent
-
-    - name: Restart EasticSearch
-      service:
-        name: elasticsearch
-        state: restarted
   when: elastic_cluster_enable
+  tags: configure
+
+- name: Restart EasticSearch
+  service:
+    name: elasticsearch
+    state: restarted
   tags: configure

@@ -1,5 +1,5 @@
 ---
-name: Test role
+name: build
 on:
   push:
     branches:

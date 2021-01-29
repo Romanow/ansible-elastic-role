@@ -1,5 +1,7 @@
 # Ansible ElasticSearch role
 
+![Build Status](https://github.com/Romanow/ansible-elastic-role/workflows/build/badge.svg)
+
 Install ElasticSearch, configure a cluster and user security and ssl communication between nodes. Install using apt-get.
 
 ### Requirements
