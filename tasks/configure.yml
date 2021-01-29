@@ -105,6 +105,7 @@
   tags: configure
 
 - name: Restart EasticSearch
+  become: yes
   service:
     name: elasticsearch
     state: restarted
